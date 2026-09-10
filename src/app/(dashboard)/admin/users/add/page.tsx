@@ -23,7 +23,7 @@ function AddUserPage() {
 
   useEffect(() => {
     if (!editId) return
-    fetch("/api/admin/users")
+    fetch("/wans/api/admin/users")
       .then((r) => r.json())
       .then((users) => {
         const u = users.find((x: { id: number }) => x.id === Number(editId))
@@ -45,7 +45,7 @@ function AddUserPage() {
       const body: Record<string, unknown> = { full_name: fullName, role }
       if (password) body.password = password
 
-      const res = await fetch(`/api/admin/users/${editId}`, {
+      const res = await fetch(`/wans/api/admin/users/${editId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -64,7 +64,7 @@ function AddUserPage() {
         return
       }
 
-      const res = await fetch("/api/admin/users", {
+      const res = await fetch("/wans/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, full_name: fullName, role, password }),

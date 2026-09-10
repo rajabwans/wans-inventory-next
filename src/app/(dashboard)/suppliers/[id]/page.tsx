@@ -32,8 +32,8 @@ export default function SupplierDetailPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/suppliers/${id}`).then((r) => r.json()),
-      fetch("/api/purchases").then((r) => r.json()),
+      fetch(`/wans/api/suppliers/${id}`).then((r) => r.json()),
+      fetch("/wans/api/purchases").then((r) => r.json()),
     ]).then(([sup, allPurchases]) => {
       if (sup?.error) throw new Error(sup.error)
       setSupplier(sup)

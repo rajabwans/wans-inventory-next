@@ -25,7 +25,7 @@ function AddSupplierPage() {
 
   useEffect(() => {
     if (editId) {
-      fetch(`/api/suppliers/${editId}`)
+      fetch(`/wans/api/suppliers/${editId}`)
         .then((r) => r.json())
         .then((d) => {
           if (d && !d.error) {

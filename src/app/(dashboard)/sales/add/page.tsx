@@ -39,8 +39,8 @@ export default function AddSalePage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/products").then((r) => r.json()),
-      fetch("/api/customers").then((r) => r.json()),
+      fetch("/wans/api/products").then((r) => r.json()),
+      fetch("/wans/api/customers").then((r) => r.json()),
     ]).then(([prods, custs]) => {
       setProducts(prods || [])
       setCustomers(custs || [])
@@ -64,7 +64,7 @@ export default function AddSalePage() {
     setError("")
 
     try {
-      const res = await fetch("/api/sales", {
+      const res = await fetch("/wans/api/sales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

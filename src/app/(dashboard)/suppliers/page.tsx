@@ -38,7 +38,7 @@ export default function SuppliersPage() {
 
   async function handleDelete(id: number, name: string) {
     if (!confirm(`Delete supplier "${name}"?`)) return
-    const res = await fetch(`/api/suppliers/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/suppliers/${id}`, { method: "DELETE" })
     if (res.ok) setSuppliers((prev) => prev.filter((s) => s.id !== id))
   }
 

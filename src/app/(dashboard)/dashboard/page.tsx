@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/dashboard")
+    fetch("/wans/api/dashboard")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => {
         setData(d)

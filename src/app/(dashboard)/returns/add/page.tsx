@@ -39,7 +39,7 @@ export default function AddReturnPage() {
   const [search, setSearch] = useState("")
 
   useEffect(() => {
-    fetch("/api/sales")
+    fetch("/wans/api/sales")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setSales(d || []))
       .catch((e) => setError(e.message))
@@ -95,7 +95,7 @@ export default function AddReturnPage() {
     }
 
     try {
-      const res = await fetch("/api/returns", {
+      const res = await fetch("/wans/api/returns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

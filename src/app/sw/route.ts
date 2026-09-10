@@ -6,7 +6,7 @@ const CACHES = [VERSION, 'wanplan-static'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(VERSION).then((cache) =>
-      cache.addAll(['/dashboard', '/icons/icon-192.png', '/icons/icon-512.png'])
+      cache.addAll(['/wans/dashboard', '/wans/icons/icon-192.png', '/wans/icons/icon-512.png'])
     ).then(() => self.skipWaiting())
   );
 });
@@ -27,9 +27,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request).then((res) => {
         const copy = res.clone();
-        caches.open(VERSION).then((c) => c.put('/dashboard', copy));
+        caches.open(VERSION).then((c) => c.put('/wans/dashboard', copy));
         return res;
-      }).catch(() => caches.match('/dashboard'))
+      }).catch(() => caches.match('/wans/dashboard'))
     );
     return;
   }

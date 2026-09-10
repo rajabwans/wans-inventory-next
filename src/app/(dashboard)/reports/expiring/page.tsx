@@ -20,7 +20,7 @@ export default function ExpiringPage() {
   function fetchReport(d: number) {
     setLoading(true)
     setError("")
-    fetch(`/api/reports/expiring?days=${d}`)
+    fetch(`/wans/api/reports/expiring?days=${d}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => { setExpiring(d.expiring); setExpired(d.expired) })
       .catch((e) => setError(e.message))

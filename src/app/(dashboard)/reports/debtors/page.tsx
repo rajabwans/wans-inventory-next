@@ -21,7 +21,7 @@ export default function DebtorsPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/reports/debtors")
+    fetch("/wans/api/reports/debtors")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => { setRows(d.rows); setTotal(d.total) })
       .catch((e) => setError(e.message))

@@ -32,7 +32,7 @@ export default function PlatformPage() {
   const [planTrialEnds, setPlanTrialEnds] = useState("")
 
   function fetchBusinesses() {
-    fetch("/api/platform")
+    fetch("/wans/api/platform")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setBusinesses(d))
       .catch((e) => setError(e.message))
@@ -55,7 +55,7 @@ export default function PlatformPage() {
     if (planPaidUntil) body.paid_until = planPaidUntil
     if (planTrialEnds) body.trial_ends_at = planTrialEnds
 
-    const res = await fetch("/api/platform/plan", {
+    const res = await fetch("/wans/api/platform/plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

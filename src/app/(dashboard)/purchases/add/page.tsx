@@ -39,8 +39,8 @@ export default function AddPurchasePage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/suppliers").then((r) => r.json()),
-      fetch("/api/products").then((r) => r.json()),
+      fetch("/wans/api/suppliers").then((r) => r.json()),
+      fetch("/wans/api/products").then((r) => r.json()),
     ]).then(([sups, prods]) => {
       setSuppliers(sups || [])
       setProducts(prods || [])
@@ -78,7 +78,7 @@ export default function AddPurchasePage() {
     }
 
     try {
-      const res = await fetch("/api/purchases", {
+      const res = await fetch("/wans/api/purchases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

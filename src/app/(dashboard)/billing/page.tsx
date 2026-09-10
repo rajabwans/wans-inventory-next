@@ -35,7 +35,7 @@ export default function BillingPage() {
   const [msg, setMsg] = useState("")
 
   useEffect(() => {
-    fetch("/api/billing")
+    fetch("/wans/api/billing")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setInfo(d))
       .catch((e) => setError(e.message))
@@ -48,7 +48,7 @@ export default function BillingPage() {
     setSubmitting(true)
     setMsg("")
 
-    const res = await fetch("/api/billing", {
+    const res = await fetch("/wans/api/billing", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ transaction_ref: txRef, note }),
@@ -58,7 +58,7 @@ export default function BillingPage() {
       setMsg("Upgrade request submitted successfully!")
       setTxRef("")
       setNote("")
-      fetch("/api/billing")
+      fetch("/wans/api/billing")
         .then((r) => r.json())
         .then((d) => setInfo(d))
     } else {

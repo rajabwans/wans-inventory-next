@@ -21,7 +21,7 @@ export default function AuditLogPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/audit")
+    fetch("/wans/api/audit")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setEntries(d))
       .catch((e) => setError(e.message))

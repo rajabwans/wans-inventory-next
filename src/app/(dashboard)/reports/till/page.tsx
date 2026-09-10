@@ -41,7 +41,7 @@ export default function TillReportPage() {
   function fetchReport(d: string) {
     setLoading(true)
     setError("")
-    fetch(`/api/reports/till?date=${d}`)
+    fetch(`/wans/api/reports/till?date=${d}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => {
         setSalesTotal(d.sales_total)
@@ -68,7 +68,7 @@ export default function TillReportPage() {
     setCloseSuccess(false)
 
     try {
-      const res = await fetch("/api/reports/till/close", {
+      const res = await fetch("/wans/api/reports/till/close", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cash_counted: Number(cashCounted) || 0, momo_counted: Number(momoCounted) || 0, card_counted: Number(cardCounted) || 0, note: closeNote || null }),

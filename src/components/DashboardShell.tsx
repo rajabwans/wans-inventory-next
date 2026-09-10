@@ -76,7 +76,7 @@ export default function DashboardShell({ children, businessName, role }: { child
   }, [])
 
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" })
+    await fetch("/wans/api/auth/logout", { method: "POST" })
     localStorage.removeItem("wanplan_biz_name")
     router.push("/login")
     router.refresh()

@@ -38,7 +38,7 @@ export default function CustomersPage() {
 
   async function handleDelete(id: number, name: string) {
     if (!confirm(`Delete customer "${name}"?`)) return
-    const res = await fetch(`/api/customers/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/customers/${id}`, { method: "DELETE" })
     if (res.ok) setCustomers((prev) => prev.filter((c) => c.id !== id))
   }
 

@@ -28,7 +28,7 @@ export default function StockReportPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/reports/stock")
+    fetch("/wans/api/reports/stock")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => { setRows(d.rows); setTotals(d.totals) })
       .catch((e) => setError(e.message))

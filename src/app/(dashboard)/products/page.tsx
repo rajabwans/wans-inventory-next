@@ -43,7 +43,7 @@ export default function ProductsPage() {
 
   async function handleDelete(id: number, title: string) {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return
-    const res = await fetch(`/api/products/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/products/${id}`, { method: "DELETE" })
     if (res.ok) setProducts((prev) => prev.filter((p) => p.id !== id))
   }
 
@@ -53,7 +53,7 @@ export default function ProductsPage() {
       return
     }
     setAdjustError("")
-    const res = await fetch(`/api/products/${productId}/adjust`, {
+    const res = await fetch(`/wans/api/products/${productId}/adjust`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

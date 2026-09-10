@@ -19,7 +19,7 @@ export default function CategoriesPage() {
   const [addError, setAddError] = useState("")
 
   function fetchCategories() {
-    fetch("/api/categories")
+    fetch("/wans/api/categories")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setCategories(d))
       .catch((e) => setError(e.message))
@@ -35,7 +35,7 @@ export default function CategoriesPage() {
     setAddError("")
 
     try {
-      const res = await fetch("/api/categories", {
+      const res = await fetch("/wans/api/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newName.trim(), kind: newKind }),
@@ -55,7 +55,7 @@ export default function CategoriesPage() {
 
   async function handleDelete(id: number, name: string) {
     if (!confirm(`Delete category "${name}"?`)) return
-    const res = await fetch(`/api/categories/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/categories/${id}`, { method: "DELETE" })
     if (res.ok) setCategories((prev) => prev.filter((c) => c.id !== id))
   }
 

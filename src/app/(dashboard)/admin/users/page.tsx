@@ -25,7 +25,7 @@ export default function UsersPage() {
   const [error, setError] = useState("")
 
   function fetchUsers() {
-    fetch("/api/admin/users")
+    fetch("/wans/api/admin/users")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setUsers(d))
       .catch((e) => setError(e.message))
@@ -36,7 +36,7 @@ export default function UsersPage() {
 
   async function handleDelete(id: number, username: string) {
     if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return
-    const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/admin/users/${id}`, { method: "DELETE" })
     if (res.ok) setUsers((prev) => prev.filter((u) => u.id !== id))
   }
 

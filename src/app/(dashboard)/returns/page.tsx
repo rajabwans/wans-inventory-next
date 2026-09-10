@@ -22,7 +22,7 @@ export default function ReturnsPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/returns")
+    fetch("/wans/api/returns")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setReturns(d))
       .catch((e) => setError(e.message))

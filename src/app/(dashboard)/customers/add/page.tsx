@@ -24,7 +24,7 @@ function AddCustomerPage() {
 
   useEffect(() => {
     if (editId) {
-      fetch(`/api/customers/${editId}`)
+      fetch(`/wans/api/customers/${editId}`)
         .then((r) => r.json())
         .then((d) => {
           if (d && !d.error) {

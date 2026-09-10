@@ -33,8 +33,8 @@ function AddProductPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/categories?kind=product").then((r) => r.json()),
-      editId ? fetch(`/api/products/${editId}`).then((r) => r.json()) : Promise.resolve(null),
+      fetch("/wans/api/categories?kind=product").then((r) => r.json()),
+      editId ? fetch(`/wans/api/products/${editId}`).then((r) => r.json()) : Promise.resolve(null),
     ]).then(([cats, product]) => {
       setCategories(cats || [])
       if (product && !product.error) {

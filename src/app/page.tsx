@@ -15,13 +15,13 @@ export default function Home() {
             </p>
             <div className="mt-10 flex justify-center gap-4">
               <Link
-                href="/login"
+                href="/wans/login"
                 className="rounded-lg bg-white px-8 py-4 text-lg font-semibold text-indigo-600 shadow-lg hover:bg-purple-50 transition"
               >
                 Login
               </Link>
               <Link
-                href="/signup"
+                href="/wans/signup"
                 className="rounded-lg border-2 border-white px-8 py-4 text-lg font-semibold hover:bg-white/10 transition"
               >
                 Sign Up Free

@@ -30,7 +30,7 @@ export default function SalesPage() {
   const [payError, setPayError] = useState("")
 
   function fetchSales() {
-    fetch("/api/sales")
+    fetch("/wans/api/sales")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setSales(d))
       .catch((e) => setError(e.message))
@@ -41,7 +41,7 @@ export default function SalesPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this sale? Stock will be restocked.")) return
-    const res = await fetch(`/api/sales/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/sales/${id}`, { method: "DELETE" })
     if (res.ok) setSales((prev) => prev.filter((s) => s.id !== id))
   }
 
@@ -51,7 +51,7 @@ export default function SalesPage() {
       return
     }
     setPayError("")
-    const res = await fetch(`/api/sales/${saleId}/pay`, {
+    const res = await fetch(`/wans/api/sales/${saleId}/pay`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: Number(payAmount), method: payMethod, note: payNote || null }),

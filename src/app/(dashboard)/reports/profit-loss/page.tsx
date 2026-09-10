@@ -33,7 +33,7 @@ export default function ProfitLossPage() {
   function fetchReport(f: string, t: string) {
     setLoading(true)
     setError("")
-    fetch(`/api/reports/profit-loss?from=${f}&to=${t}`)
+    fetch(`/wans/api/reports/profit-loss?from=${f}&to=${t}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setData(d))
       .catch((e) => setError(e.message))

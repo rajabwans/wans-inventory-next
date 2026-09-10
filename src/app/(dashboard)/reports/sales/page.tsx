@@ -36,7 +36,7 @@ export default function SalesReportPage() {
   function fetchReport(f: string, t: string) {
     setLoading(true)
     setError("")
-    fetch(`/api/reports/sales?from=${f}&to=${t}`)
+    fetch(`/wans/api/reports/sales?from=${f}&to=${t}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => { setRows(d.rows); setTotals(d.totals) })
       .catch((e) => setError(e.message))

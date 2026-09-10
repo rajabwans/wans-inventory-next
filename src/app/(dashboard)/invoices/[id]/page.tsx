@@ -27,7 +27,7 @@ export default function InvoiceDetailPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch(`/api/sales/${id}`)
+    fetch(`/wans/api/sales/${id}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setSale(d))
       .catch((e) => setError(e.message))

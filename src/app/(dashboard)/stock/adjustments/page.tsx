@@ -27,7 +27,7 @@ export default function StockAdjustmentsPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/stock/adjustments")
+    fetch("/wans/api/stock/adjustments")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setAdjustments(d))
       .catch((e) => setError(e.message))

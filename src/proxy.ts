@@ -4,9 +4,11 @@ import { jwtVerify } from "jose"
 
 const SECRET = new TextEncoder().encode(process.env.SESSION_SECRET || "dev-wanplan-session-secret-change-me")
 const COOKIE_NAME = "wanplan_session"
+const BASE = "/wans"
+const LOGIN = `${BASE}/login`
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/api/auth/login", "/api/auth/signup"]
-const API_PREFIX = "/api"
+const PUBLIC_PATHS = [BASE, `${BASE}/`, `${BASE}/login`, `${BASE}/signup`, `${BASE}/api/auth/login`, `${BASE}/api/auth/signup`]
+const API_PREFIX = `${BASE}/api`
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -23,7 +25,7 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith(API_PREFIX)) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
-    return NextResponse.redirect(new URL("/login", request.url))
+    return NextResponse.redirect(new URL(LOGIN, request.url))
   }
 
   try {
@@ -33,7 +35,7 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith(API_PREFIX)) {
       return NextResponse.json({ error: "Session expired" }, { status: 401 })
     }
-    const res = NextResponse.redirect(new URL("/login", request.url))
+    const res = NextResponse.redirect(new URL(LOGIN, request.url))
     res.cookies.delete(COOKIE_NAME)
     return res
   }

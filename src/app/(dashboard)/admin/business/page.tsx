@@ -13,7 +13,7 @@ export default function BusinessSettingsPage() {
   const [err, setErr] = useState("")
 
   useEffect(() => {
-    fetch("/api/admin/business")
+    fetch("/wans/api/admin/business")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => {
         setName(d.name || "")
@@ -30,7 +30,7 @@ export default function BusinessSettingsPage() {
     setMsg("")
     setErr("")
 
-    const res = await fetch("/api/admin/business", {
+    const res = await fetch("/wans/api/admin/business", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, currency, about }),

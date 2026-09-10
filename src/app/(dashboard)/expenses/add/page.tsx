@@ -20,7 +20,7 @@ export default function AddExpensePage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/categories?kind=expense")
+    fetch("/wans/api/categories?kind=expense")
       .then((r) => (r.ok ? r.json() : []))
       .then((d) => setCategories(d))
       .catch(() => {})
@@ -32,7 +32,7 @@ export default function AddExpensePage() {
     setError("")
 
     try {
-      const res = await fetch("/api/expenses", {
+      const res = await fetch("/wans/api/expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ description, amount: Number(amount), category: category || null }),

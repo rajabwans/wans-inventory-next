@@ -33,8 +33,8 @@ export default function CustomerDetailPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/customers/${id}`).then((r) => r.json()),
-      fetch(`/api/sales`).then((r) => r.json()),
+      fetch(`/wans/api/customers/${id}`).then((r) => r.json()),
+      fetch(`/wans/api/sales`).then((r) => r.json()),
     ]).then(([cust, allSales]) => {
       if (cust?.error) throw new Error(cust.error)
       setCustomer(cust)

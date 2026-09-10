@@ -21,7 +21,7 @@ export default function PurchasesPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/purchases")
+    fetch("/wans/api/purchases")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
       .then((d) => setPurchases(d))
       .catch((e) => setError(e.message))

@@ -38,7 +38,7 @@ export default function ExpensesPage() {
 
   async function handleDelete(id: number, description: string) {
     if (!confirm(`Delete expense "${description}"?`)) return
-    const res = await fetch(`/api/expenses/${id}`, { method: "DELETE" })
+    const res = await fetch(`/wans/api/expenses/${id}`, { method: "DELETE" })
     if (res.ok) setExpenses((prev) => prev.filter((e) => e.id !== id))
   }
 
