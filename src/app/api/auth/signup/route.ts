@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import bcrypt from "bcryptjs"
+import { hashPassword } from "@/lib/passwords"
 import { supabase } from "@/lib/supabase"
 
 export async function POST(req: Request) {
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "That business slug is already taken" }, { status: 409 })
   }
 
-  const passwordHash = await bcrypt.hash(password, 12)
+  const passwordHash = await hashPassword(password)
 
   // Create business (pending approval)
   const { data: business, error: bizErr } = await supabase

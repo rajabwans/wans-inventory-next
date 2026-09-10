@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
-import bcrypt from "bcryptjs"
+import { hashPassword } from "@/lib/passwords"
 
 export const dynamic = "force-dynamic"
 
@@ -35,7 +35,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const updates: Record<string, unknown> = {}
   if (body.full_name !== undefined) updates.full_name = body.full_name
   if (body.role !== undefined) updates.role = body.role
-  if (body.password) updates.password_hash = await bcrypt.hash(body.password, 12)
+  if (body.password) updates.password_hash = await hashPassword(body.password)
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "No fields to update" }, { status: 400 })

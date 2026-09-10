@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import bcrypt from "bcryptjs"
 import { supabase } from "@/lib/supabase"
 import { createSession } from "@/lib/session"
+import { verifyPassword } from "@/lib/passwords"
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid username or password" }, { status: 401 })
   }
 
-  const valid = await bcrypt.compare(password, user.password_hash)
+  const valid = await verifyPassword(password, user.password_hash)
   if (!valid) {
     return NextResponse.json({ error: "Invalid username or password" }, { status: 401 })
   }

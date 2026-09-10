@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
-import bcrypt from "bcryptjs"
+import { hashPassword } from "@/lib/passwords"
 
 export const dynamic = "force-dynamic"
 
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Username already exists" }, { status: 409 })
   }
 
-  const passwordHash = await bcrypt.hash(body.password, 12)
+  const passwordHash = await hashPassword(body.password)
 
   const { data, error } = await supabase
     .from("users")
