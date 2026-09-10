@@ -1,6 +1,6 @@
 export async function GET() {
   const sw = `
-const VERSION = 'wanplan-v1';
+const VERSION = 'wanplan-v2';
 const CACHES = [VERSION, 'wanplan-static'];
 
 self.addEventListener('install', (event) => {
