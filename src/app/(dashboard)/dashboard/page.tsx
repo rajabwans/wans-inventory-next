@@ -80,22 +80,29 @@ export default function DashboardPage() {
 
   return (
     <DashboardShell businessName={data.biz?.name || ""} role={data.biz?.plan || ""}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">{data.biz?.name} &middot; Plan: <span className="capitalize">{data.plan}</span></p>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 className="text-2xl font-bold mb-0"><span className="mr-2">Executive Dashboard</span></h1>
+          <p className="text-gray-500 text-sm mt-1">{data.biz?.name} — Inventory Performance Overview</p>
+        </div>
+        <span className="text-gray-400 text-sm" id="currentDate"></span>
       </div>
 
       {/* KPI grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
         {kpis.map((k) => (
-          <div key={k.label} className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-            <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${k.grad} flex items-center justify-center mb-3`}>
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d={k.icon} />
-              </svg>
+          <div key={k.label} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 h-full hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-[0.78rem] font-semibold uppercase tracking-wider text-gray-400">{k.label}</div>
+                <div className="text-2xl font-extrabold mt-2 truncate">{k.value}</div>
+              </div>
+              <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${k.grad} flex items-center justify-center shadow-md`}>
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d={k.icon} />
+                </svg>
+              </div>
             </div>
-            <div className="text-lg font-bold truncate">{k.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{k.label}</div>
           </div>
         ))}
       </div>
