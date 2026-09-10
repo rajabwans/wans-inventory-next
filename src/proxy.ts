@@ -4,11 +4,10 @@ import { jwtVerify } from "jose"
 
 const SECRET = new TextEncoder().encode(process.env.SESSION_SECRET || "dev-wanplan-session-secret-change-me")
 const COOKIE_NAME = "wanplan_session"
-const BASE = "/wans"
-const LOGIN = `${BASE}/login`
+const LOGIN = "/wans/login"
+const PUBLIC = "/wans"
 
-const PUBLIC_PATHS = [BASE, `${BASE}/`, `${BASE}/login`, `${BASE}/signup`, `${BASE}/api/auth/login`, `${BASE}/api/auth/signup`]
-const API_PREFIX = `${BASE}/api`
+const PUBLIC_PATHS = ["/", PUBLIC, "/login", "/signup", "/api/auth/login", "/api/auth/signup"]
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -22,7 +21,7 @@ export async function proxy(request: NextRequest) {
 
   if (!token) {
     // API routes return 401 JSON, pages redirect to login
-    if (pathname.startsWith(API_PREFIX)) {
+    if (pathname.startsWith("/api")) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
     return NextResponse.redirect(new URL(LOGIN, request.url))
@@ -32,7 +31,7 @@ export async function proxy(request: NextRequest) {
     await jwtVerify(token, SECRET)
     return NextResponse.next()
   } catch {
-    if (pathname.startsWith(API_PREFIX)) {
+    if (pathname.startsWith("/api")) {
       return NextResponse.json({ error: "Session expired" }, { status: 401 })
     }
     const res = NextResponse.redirect(new URL(LOGIN, request.url))
