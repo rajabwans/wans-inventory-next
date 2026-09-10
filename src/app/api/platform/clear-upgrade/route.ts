@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+import fs from "fs"
+import path from "path"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
 
@@ -18,6 +20,20 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null)
   if (!body?.id) return NextResponse.json({ error: "Business ID is required" }, { status: 400 })
+
+  const { data: business } = await supabase
+    .from("businesses")
+    .select("upgrade_proof")
+    .eq("id", body.id)
+    .single()
+
+  if (business?.upgrade_proof) {
+    try {
+      fs.unlinkSync(path.join(process.cwd(), "uploads", path.basename(business.upgrade_proof)))
+    } catch {
+      // ignore
+    }
+  }
 
   const { error } = await supabase
     .from("businesses")

@@ -61,6 +61,8 @@ export default function ProfitLossPage() {
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
         <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Apply</button>
+        <a href={`/wans/api/reports/profit-loss/pdf?from=${from}&to=${to}`} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Download PDF</a>
+        <a href={`/wans/api/reports/profit-loss/csv?from=${from}&to=${to}`} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Export CSV</a>
       </form>
 
       {loading ? (

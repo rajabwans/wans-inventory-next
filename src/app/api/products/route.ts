@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
+import { planGate } from "@/lib/planGate"
+import { checkLimit } from "@/lib/limits"
 
 export const dynamic = "force-dynamic"
 
@@ -34,10 +36,20 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
+  const gate = await planGate(session)
+  if (gate) return gate
 
   const bid = session.business_id
   const body = await req.json().catch(() => null)
   if (!body?.title) return NextResponse.json({ error: "Title is required" }, { status: 400 })
+
+  const limit = await checkLimit(bid, "products")
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: limit.plan === "trial" ? "Trial plan allows maximum 50 products" : "Not allowed on current plan" },
+      { status: 409 }
+    )
+  }
 
   const { data, error } = await supabase
     .from("products")

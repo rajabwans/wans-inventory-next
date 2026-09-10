@@ -1,11 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import PWA from "@/components/PWA";
 
 export const metadata: Metadata = {
-  title: "WANPLAN - Inventory Management",
-  description: "Multi-tenant SaaS inventory management system",
-  manifest: "/manifest.webmanifest",
+  title: "WANPLAN - Inventory & Sales Management",
+  description: "wanland planner - inventory & sales management",
 };
 
 export const viewport: Viewport = {
@@ -22,9 +20,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased bg-gray-50 text-gray-900">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link href="/wans/wanplan/vendor/bootstrap/bootstrap.min.css" rel="stylesheet" />
+        <link href="/wans/wanplan/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" />
+        <link href="/wans/wanplan/style.css" rel="stylesheet" />
+      </head>
+      <body>
         {children}
-        <PWA />
+        <script src="/wans/wanplan/vendor/bootstrap/bootstrap.bundle.min.js" />
       </body>
     </html>
   );

@@ -54,7 +54,8 @@ export default function ReceiptPage() {
         </Link>
         <h1 className="text-2xl font-bold">Receipt</h1>
         <div className="ml-auto flex gap-2 no-print">
-          <button onClick={printReceipt} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Print</button>
+          <a href={`/wans/api/receipts/${sale.id}/pdf`} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Download PDF</a>
+          <button onClick={printReceipt} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Print</button>
           <a href={waLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">WhatsApp</a>
         </div>
       </div>

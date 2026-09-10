@@ -14,6 +14,8 @@ interface Business {
   paid_until: string | null
   upgrade_requested: number | null
   upgrade_note: string | null
+  upgrade_proof: string | null
+  upgrade_requested_at: string | null
 }
 
 const statusBadge: Record<string, string> = {
@@ -23,6 +25,16 @@ const statusBadge: Record<string, string> = {
   rejected: "bg-gray-100 text-gray-500",
 }
 
+function parseUpgradeNote(raw: string | null): { ref: string; note: string } {
+  if (!raw) return { ref: "", note: "" }
+  try {
+    const parsed = JSON.parse(raw)
+    return { ref: parsed.ref || "", note: parsed.note || "" }
+  } catch {
+    return { ref: raw, note: "" }
+  }
+}
+
 export default function PlatformPage() {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,6 +42,7 @@ export default function PlatformPage() {
   const [planModal, setPlanModal] = useState<number | null>(null)
   const [planPaidUntil, setPlanPaidUntil] = useState("")
   const [planTrialEnds, setPlanTrialEnds] = useState("")
+  const [upgradeBiz, setUpgradeBiz] = useState<Business | null>(null)
 
   function fetchBusinesses() {
     fetch("/wans/api/platform")
@@ -66,6 +79,13 @@ export default function PlatformPage() {
       setPlanTrialEnds("")
       fetchBusinesses()
     }
+  }
+
+  async function handleConfirmPayment(b: Business) {
+    setUpgradeBiz(null)
+    setPlanModal(b.id)
+    setPlanPaidUntil(b.paid_until ? b.paid_until.split("T")[0] : "")
+    setPlanTrialEnds(b.trial_ends_at ? b.trial_ends_at.split("T")[0] : "")
   }
 
   if (loading) return <DashboardShell businessName="" role=""><div className="text-center py-20 text-gray-400">Loading platform data...</div></DashboardShell>
@@ -109,7 +129,10 @@ export default function PlatformPage() {
                 <td className="py-2.5 px-4 text-gray-500 text-xs">{b.paid_until ? new Date(b.paid_until).toLocaleDateString() : "-"}</td>
                 <td className="py-2.5 px-4">
                   {b.upgrade_requested ? (
-                    <span className="inline-block w-3 h-3 bg-amber-400 rounded-full" title="Upgrade requested" />
+                    <button onClick={() => setUpgradeBiz(b)} className="inline-flex items-center gap-1 text-amber-600 hover:text-amber-700 text-xs font-medium" title="View upgrade request">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.5 5 7.5-5" stroke="none" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 8v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.5 5 7.5-5" /></svg>
+                      Review
+                    </button>
                   ) : (
                     <span className="text-gray-300">-</span>
                   )}
@@ -136,6 +159,63 @@ export default function PlatformPage() {
           </tbody>
         </table>
       </div>
+
+      {upgradeBiz && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setUpgradeBiz(null) }}>
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-bold">Upgrade Request</h2>
+                <p className="text-sm text-gray-500">{upgradeBiz.name} ({upgradeBiz.slug})</p>
+              </div>
+              <button onClick={() => setUpgradeBiz(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+
+            {(() => {
+              const { ref, note } = parseUpgradeNote(upgradeBiz.upgrade_note)
+              return (
+                <div className="space-y-3 text-sm mb-4">
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Transaction Ref</div>
+                    <div className="font-medium">{ref || "-"}</div>
+                  </div>
+                  {upgradeBiz.upgrade_requested_at && (
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Submitted</div>
+                      <div className="font-medium">{new Date(upgradeBiz.upgrade_requested_at).toLocaleString()}</div>
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Note</div>
+                    <div className="text-gray-700">{note || "-"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Payment Proof</div>
+                    {upgradeBiz.upgrade_proof ? (
+                      <img
+                        src={`/wans/api/uploads?file=${encodeURIComponent(upgradeBiz.upgrade_proof)}`}
+                        alt="Payment proof"
+                        className="w-full rounded-lg border border-gray-100 mt-1"
+                      />
+                    ) : (
+                      <div className="text-gray-400 text-sm">No proof uploaded</div>
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
+
+            <div className="flex gap-3">
+              <button onClick={() => handleConfirmPayment(upgradeBiz)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
+                Confirm payment &#8594; set plan
+              </button>
+              <button onClick={() => action("/api/platform/clear-upgrade", upgradeBiz.id)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {planModal !== null && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setPlanModal(null) }}>

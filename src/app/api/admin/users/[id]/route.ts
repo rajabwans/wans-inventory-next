@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
+import { planGate } from "@/lib/planGate"
 import { hashPassword } from "@/lib/passwords"
 
 export const dynamic = "force-dynamic"
@@ -12,6 +13,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
+  const gate = await planGate(session)
+  if (gate) return gate
 
   if (!["admin", "superadmin"].includes(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
@@ -69,6 +72,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
+  const gate = await planGate(session)
+  if (gate) return gate
 
   if (!["admin", "superadmin"].includes(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })

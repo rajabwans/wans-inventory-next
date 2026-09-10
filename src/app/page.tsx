@@ -63,9 +63,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="mt-6 text-xl font-semibold">Offline Ready</h3>
+              <h3 className="mt-6 text-xl font-semibold">Billing & Reports</h3>
               <p className="mt-3 text-gray-600">
-                Works offline and syncs when you&apos;re back online
+                Track payments, expenses, and generate detailed reports
               </p>
             </div>
           </div>

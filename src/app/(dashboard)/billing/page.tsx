@@ -31,6 +31,7 @@ export default function BillingPage() {
   const [error, setError] = useState("")
   const [txRef, setTxRef] = useState("")
   const [note, setNote] = useState("")
+  const [proof, setProof] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [msg, setMsg] = useState("")
 
@@ -48,16 +49,21 @@ export default function BillingPage() {
     setSubmitting(true)
     setMsg("")
 
-    const res = await fetch("/wans/api/billing", {
+    const form = new FormData()
+    form.append("transaction_ref", txRef)
+    form.append("note", note)
+    if (proof) form.append("proof", proof)
+
+    const res = await fetch("/wans/api/billing/request-upgrade", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transaction_ref: txRef, note }),
+      body: form,
     })
 
     if (res.ok) {
       setMsg("Upgrade request submitted successfully!")
       setTxRef("")
       setNote("")
+      setProof(null)
       fetch("/wans/api/billing")
         .then((r) => r.json())
         .then((d) => setInfo(d))
@@ -157,6 +163,17 @@ export default function BillingPage() {
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Payment Proof (optional)</label>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={(e) => setProof(e.target.files?.[0] || null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+              <p className="text-xs text-gray-400 mt-1">PNG, JPG, WEBP or GIF, up to 5MB. Screenshot of the Mobile Money transaction.</p>
             </div>
 
             <button

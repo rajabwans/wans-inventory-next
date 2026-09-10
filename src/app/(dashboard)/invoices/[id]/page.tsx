@@ -47,7 +47,10 @@ export default function InvoiceDetailPage() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </Link>
         <h1 className="text-2xl font-bold">Invoice</h1>
-        <button onClick={() => window.print()} className="ml-auto px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 no-print">Print</button>
+        <div className="ml-auto flex gap-2 no-print">
+          <a href={`/wans/api/invoices/${sale.id}/pdf`} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Download PDF</a>
+          <button onClick={() => window.print()} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 no-print">Print</button>
+        </div>
       </div>
 
       <div className="max-w-lg mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-8 print:shadow-none print:border-none print:p-4">

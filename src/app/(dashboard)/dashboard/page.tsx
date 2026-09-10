@@ -7,26 +7,26 @@ import Link from "next/link"
 interface Biz {
   name: string
   currency: string
+  plan: string
 }
 
-interface Sale {
-  id: number
-  sale_date: string
-  total_amount: number
-  profit: number
-  payment_status: string
-  payment_method: string
-  product_title: string
-  customer_display: string
-}
-
-interface Product {
-  id: number
-  title: string
-  quantity: number
-  selling_price: number
-  buying_price: number
-  category: string | null
+interface Stats {
+  total_products: number
+  total_stock: number
+  total_invested: number
+  total_sales_amount: number
+  total_profit: number
+  total_possible_profit: number
+  total_customers: number
+  owing_total: number
+  debtor_count: number
+  expiring_count: number
+  expired_count: number
+  purchase_total: number
+  monthly_profit: number
+  monthly_expenses: number
+  recent_sales_count: number
+  recovery: number
 }
 
 function money(n: number | string, cur = "UGX") {
@@ -48,214 +48,312 @@ export default function DashboardPage() {
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
+
+    const el = document.getElementById("currentDate")
+    if (el) el.textContent = new Date().toLocaleDateString("en-UG", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
   }, [])
 
-  if (loading) return <DashboardShell businessName="" role=""><div className="text-center py-20 text-gray-400">Loading dashboard...</div></DashboardShell>
-  if (error || !data) return <DashboardShell businessName="" role=""><div className="text-center py-20 text-red-500">{error || "Could not load dashboard"}</div></DashboardShell>
+  if (loading) return <DashboardShell businessName="" role=""><div className="text-center py-20 text-muted">Loading dashboard...</div></DashboardShell>
+  if (error || !data) return <DashboardShell businessName="" role=""><div className="text-center py-20 text-danger">{error || "Could not load dashboard"}</div></DashboardShell>
 
-  const s = data.stats
+  const s: Stats = data.stats
   const cur = data.biz?.currency || "UGX"
+  const bizName: string = data.biz?.name || ""
+  const plan: string = data.biz?.plan || data.plan || ""
 
-  const kpis = [
-    { label: "Total Products", value: s.total_products.toLocaleString(), icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4", grad: "from-indigo-500 to-blue-500" },
-    { label: "Stock Units", value: s.total_stock.toLocaleString(), icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4", grad: "from-violet-500 to-purple-500" },
-    { label: "Stock Value", value: money(s.total_invested, cur), icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z", grad: "from-sky-500 to-cyan-500" },
-    { label: "Total Sales", value: money(s.total_sales_amount, cur), icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", grad: "from-emerald-500 to-green-500" },
-    { label: "Total Profit", value: money(s.total_profit, cur), icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6", grad: "from-amber-500 to-yellow-500" },
-    { label: "Potential Profit", value: money(s.total_possible_profit, cur), icon: "M15 15m-2 0a2 2 0 103 0 2 2 0 10-3 0m-8 0a2 2 0 103 0 2 2 0 10-3 0m-2.5-4l-1.5-8h17.5l-1.5 8h-14.5z", grad: "from-teal-500 to-emerald-500" },
-    { label: "Customers", value: s.total_customers.toLocaleString(), icon: "M17 20h5v-2a3 3 0 00-5-4.5M9 20h6M14 7a3 3 0 11-6 0 3 3 0 016 0z", grad: "from-rose-500 to-pink-500" },
-    { label: "Receivables", value: money(s.owing_total, cur), icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1", grad: "from-slate-500 to-gray-500" },
-    { label: "Purchases", value: money(s.purchase_total, cur), icon: "M3 3h18v18H3V3zm3-3v18M3 9h18", grad: "from-orange-500 to-amber-500" },
-    { label: "Expiring (30d)", value: s.expiring_count.toLocaleString(), icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z", grad: "from-yellow-500 to-orange-500" },
-    { label: "Expired", value: s.expired_count.toLocaleString(), icon: "M18.364 18.364A9 9 0 005.636 5.636M21 12a9 9 0 11-18 0 9 9 0 0118 0z", grad: "from-red-500 to-rose-500" },
-    { label: "Recovery Rate", value: `${s.recovery}%`, icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6", grad: "from-cyan-500 to-sky-500" },
-  ]
+  const total_cogs = s.total_sales_amount - s.total_profit
+  const capital_deployed = total_cogs + s.total_invested
+  let recovered = capital_deployed > 0 ? (total_cogs / capital_deployed) * 100 : 0
+  if (recovered > 100) recovered = 100
+  if (recovered < 0) recovered = 0
 
-  const statusStyle: Record<string, string> = {
-    paid: "bg-green-50 text-green-700",
-    partial: "bg-amber-50 text-amber-700",
-    unpaid: "bg-red-50 text-red-700",
-    refunded: "bg-gray-100 text-gray-600",
-  }
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
 
   return (
-    <DashboardShell businessName={data.biz?.name || ""} role={data.biz?.plan || ""}>
+    <DashboardShell businessName={bizName} role={plan} currency={cur}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold mb-0"><span className="mr-2">Executive Dashboard</span></h1>
-          <p className="text-gray-500 text-sm mt-1">{data.biz?.name} — Inventory Performance Overview</p>
+          <h3 className="fw-bold mb-0"><i className="bi bi-speedometer2"></i> Executive Dashboard</h3>
+          <p className="text-muted small mb-0">{bizName} — Inventory Performance Overview</p>
         </div>
-        <span className="text-gray-400 text-sm" id="currentDate"></span>
+        <span className="text-muted small" id="currentDate"></span>
       </div>
 
-      {/* KPI grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
-        {kpis.map((k) => (
-          <div key={k.label} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 h-full hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="text-[0.78rem] font-semibold uppercase tracking-wider text-gray-400">{k.label}</div>
-                <div className="text-2xl font-extrabold mt-2 truncate">{k.value}</div>
+      <div className="row g-3 mb-4">
+        <Link href="/products" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Total Products</span>
+                <h3 className="stat-value mb-1">{fmt(s.total_products)}</h3>
+                <p className="small text-muted mb-0">{money(s.total_invested, cur)} invested</p>
               </div>
-              <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${k.grad} flex items-center justify-center shadow-md`}>
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d={k.icon} />
-                </svg>
+              <span className="stat-icon indigo"><i className="bi bi-box-seam"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/products" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Stock Units</span>
+                <h3 className="stat-value mb-1">{fmt(s.total_stock)}</h3>
+                <p className="small text-muted mb-0">Units across all products</p>
+              </div>
+              <span className="stat-icon violet"><i className="bi bi-archive"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/sales" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Total Revenue</span>
+                <h3 className="stat-value mb-1">{money(s.total_sales_amount, cur)}</h3>
+                <p className="small text-muted mb-0">{s.recent_sales_count || 0} transactions</p>
+              </div>
+              <span className="stat-icon sky"><i className="bi bi-graph-up-arrow"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/sales" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Net Profit</span>
+                <h3 className="stat-value mb-1">{money(s.total_profit, cur)}</h3>
+                <p className="small text-muted mb-0">
+                  {s.total_sales_amount > 0 ? `${((s.total_profit / s.total_sales_amount) * 100).toFixed(1)}% margin` : "No sales yet"}
+                </p>
+              </div>
+              <span className="stat-icon emerald"><i className="bi bi-cash-stack"></i></span>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      <div className="row g-3 mb-4">
+        <Link href="/products" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Capital Invested</span>
+                <h4 className="stat-value mb-1">{money(s.total_invested, cur)}</h4>
+                <p className="small text-muted mb-0">Total buying cost of stock</p>
+              </div>
+              <span className="stat-icon slate"><i className="bi bi-bank"></i></span>
+            </div>
+          </div>
+        </Link>
+        <div className="col-6 col-lg-3">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">This Month</span>
+                <h4 className="stat-value mb-1">{money(s.monthly_profit - s.monthly_expenses, cur)}</h4>
+                <p className="small text-muted mb-0">Rev {money(s.monthly_profit, cur)} · Exp {money(s.monthly_expenses, cur)}</p>
+              </div>
+              <span className="stat-icon amber"><i className="bi bi-calendar-month"></i></span>
+            </div>
+          </div>
+        </div>
+        <Link href="/products" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Expected Profit</span>
+                <h4 className="stat-value text-success mb-1">{money(s.total_possible_profit, cur)}</h4>
+                <p className="small text-muted mb-0">If all stock sells at listed price</p>
+              </div>
+              <span className="stat-icon teal"><i className="bi bi-graph-up"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/sales" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Capital Recovery</span>
+                <h4 className="stat-value mb-1">{recovered.toFixed(1)}%</h4>
+                <div className="progress mt-1" style={{ height: 6 }}>
+                  <div className="progress-bar bg-success" style={{ width: `${recovered.toFixed(1)}%` }}></div>
+                </div>
+                <p className="small text-muted mb-0">{fmt(total_cogs)} {cur} recovered of {fmt(capital_deployed)} {cur} deployed</p>
+              </div>
+              <span className="stat-icon rose"><i className="bi bi-arrow-repeat"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/products" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Low Stock Items</span>
+                <h4 className={`stat-value ${data.low_stock?.length > 0 ? "text-danger" : "text-success"} mb-1`}>{data.low_stock?.length || 0}</h4>
+                <p className="small text-muted mb-0">Items with 5 or fewer units</p>
+              </div>
+              <span className={`stat-icon ${data.low_stock?.length > 0 ? "red" : "emerald"}`}><i className="bi bi-exclamation-triangle"></i></span>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      <div className="row g-3 mb-4">
+        <Link href="/sales" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Receivables (Credit)</span>
+                <h4 className={`stat-value ${s.owing_total > 0 ? "text-danger" : "text-success"} mb-1`}>{money(s.owing_total, cur)}</h4>
+                <p className="small text-muted mb-0">{s.debtor_count} invoice{s.debtor_count !== 1 ? "s" : ""} owing · <a className="text-decoration-none" href="/reports/debtors">Debtors</a></p>
+              </div>
+              <span className={`stat-icon ${s.owing_total > 0 ? "red" : "emerald"}`}><i className="bi bi-people"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/purchases" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Purchases (total)</span>
+                <h4 className="stat-value mb-1">{money(s.purchase_total, cur)}</h4>
+                <p className="small text-muted mb-0">All suppliers combined</p>
+              </div>
+              <span className="stat-icon indigo"><i className="bi bi-bag"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/reports/till" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Expiring / Expired</span>
+                <h4 className={`stat-value ${s.expired_count > 0 ? "text-danger" : s.expiring_count > 0 ? "text-warning" : "text-success"} mb-1`}>{fmt(s.expiring_count)} <small>/ {fmt(s.expired_count)}</small></h4>
+                <p className="small text-muted mb-0">Units expiring(30d) / expired</p>
+              </div>
+              <span className={`stat-icon ${s.expired_count > 0 ? "red" : s.expiring_count > 0 ? "amber" : "emerald"}`}><i className="bi bi-hourglass-split"></i></span>
+            </div>
+          </div>
+        </Link>
+        <Link href="/expenses" className="col-6 col-lg-3 text-decoration-none">
+          <div className="card stat-card shadow-sm h-100">
+            <div className="card-body d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span className="stat-label">Expenses</span>
+                <h4 className="stat-value mb-1">{money(s.monthly_expenses, cur)}</h4>
+                <p className="small text-muted mb-0">This month · <a className="text-decoration-none" href="/reports/till">Till</a> · <a className="text-decoration-none" href="/reports/expiring">Expiry</a></p>
+              </div>
+              <span className="stat-icon slate"><i className="bi bi-cash-stack"></i></span>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      <div className="row g-3">
+        <div className="col-md-6">
+          <div className="card shadow-sm">
+            <div className="card-header bg-white d-flex justify-content-between align-items-center">
+              <strong><i className="bi bi-exclamation-triangle text-warning"></i> Low Stock Alert</strong>
+              <a href="/products" className="btn btn-sm btn-outline-dark"><i className="bi bi-eye"></i> View All</a>
+            </div>
+            <div className="card-body p-0">
+              <div className="table-responsive">
+                <table className="table table-sm mb-0">
+                  <thead className="table-light"><tr><th>Product</th><th>Qty</th><th>Value at Cost</th><th>Action</th></tr></thead>
+                  <tbody>
+                    {(data.low_stock || []).map((item: any) => (
+                      <tr key={item.id}>
+                        <td>{item.title}</td>
+                        <td><span className="badge bg-danger">{item.quantity}</span></td>
+                        <td>{money(item.quantity * item.buying_price, cur)}</td>
+                        <td><a href={`/products/edit?id=${item.id}`} className="btn btn-sm btn-outline-primary">Restock</a></td>
+                      </tr>
+                    ))}
+                    {(!data.low_stock || data.low_stock.length === 0) && (
+                      <tr><td colSpan={4} className="text-center text-muted py-4"><i className="bi bi-check-circle text-success fs-5"></i> All products are well stocked</td></tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Alerts */}
-      {(Number(s.expired_count) > 0 || s.low_stock?.length > 0 || Number(s.owing_total) > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-          {Number(s.expired_count) > 0 && (
-            <Link href="/reports/expiring" className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 hover:bg-red-100 transition">
-              <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          {data.category_breakdown && data.category_breakdown.length > 0 && (
+            <div className="card shadow-sm mt-3">
+              <div className="card-header bg-white">
+                <strong><i className="bi bi-pie-chart"></i> Category Breakdown</strong>
               </div>
-              <div>
-                <div className="font-semibold text-red-800">{s.expired_count} units expired</div>
-                <div className="text-xs text-red-600">Check expiring stock report</div>
+              <div className="card-body p-0">
+                <div className="table-responsive">
+                  <table className="table table-sm mb-0">
+                    <thead className="table-light"><tr><th>Category</th><th>Products</th><th>Stock</th><th>Value</th></tr></thead>
+                    <tbody>
+                      {data.category_breakdown.map((cat: any, i: number) => (
+                        <tr key={i}>
+                          <td><strong>{cat.category || "Uncategorized"}</strong></td>
+                          <td>{cat.count}</td>
+                          <td>{cat.stock}</td>
+                          <td>{money(cat.value, cur)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </Link>
-          )}
-          {Number(s.expiring_count) > 0 && (
-            <Link href="/reports/expiring" className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3 hover:bg-amber-100 transition">
-              <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              </div>
-              <div>
-                <div className="font-semibold text-amber-800">{s.expiring_count} units expiring soon</div>
-                <div className="text-xs text-amber-600">Within 30 days</div>
-              </div>
-            </Link>
-          )}
-          {Number(s.owing_total) > 0 && (
-            <Link href="/reports/debtors" className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-3 hover:bg-purple-100 transition">
-              <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-              </div>
-              <div>
-                <div className="font-semibold text-purple-800">{s.debtor_count} debtors owing {money(s.owing_total, cur)}</div>
-                <div className="text-xs text-purple-600">View debtors report</div>
-              </div>
-            </Link>
+            </div>
           )}
         </div>
-      )}
-
-      {/* Recent sales */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Recent Sales</h2>
-          <Link href="/sales" className="text-sm text-indigo-600 hover:underline">View all &rarr;</Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100">
-                <th className="py-2 pr-4">Product</th>
-                <th className="py-2 pr-4">Customer</th>
-                <th className="py-2 pr-4">Amount</th>
-                <th className="py-2 pr-4">Status</th>
-                <th className="py-2 pr-4">Method</th>
-                <th className="py-2">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.recent_sales.length === 0 && (
-                <tr><td colSpan={6} className="py-6 text-center text-gray-400">No sales yet. <Link href="/sales/add" className="text-indigo-600">Make your first sale</Link></td></tr>
-              )}
-              {data.recent_sales.map((sale: Sale) => (
-                <tr key={sale.id} className="border-b border-gray-50 last:border-0">
-                  <td className="py-2.5 pr-4 font-medium">{sale.product_title}</td>
-                  <td className="py-2.5 pr-4 text-gray-600">{sale.customer_display}</td>
-                  <td className="py-2.5 pr-4">{money(sale.total_amount, cur)}</td>
-                  <td className="py-2.5 pr-4">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs capitalize ${statusStyle[sale.payment_status] || "bg-gray-100 text-gray-600"}`}>{sale.payment_status}</span>
-                  </td>
-                  <td className="py-2.5 pr-4 text-gray-600 capitalize">{sale.payment_method}</td>
-                  <td className="py-2.5 text-gray-500">{new Date(sale.sale_date).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Low stock */}
-        <div>
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Low Stock</h2>
-            {data.low_stock.length === 0 ? (
-              <p className="text-gray-400 text-sm">All products are well stocked.</p>
-            ) : (
-              <ul className="space-y-3">
-                {data.low_stock.map((p: Product) => (
-                  <li key={p.id} className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-sm">{p.title}</div>
-                      <div className="text-xs text-gray-400">{p.category || "Uncategorized"}</div>
-                    </div>
-                    <div className={`font-bold ${Number(p.quantity) <= 0 ? "text-red-500" : "text-amber-500"}`}>{p.quantity} left</div>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="col-md-6">
+          <div className="card shadow-sm">
+            <div className="card-header bg-white d-flex justify-content-between align-items-center">
+              <strong><i className="bi bi-clock-history"></i> Recent Transactions</strong>
+              <a href="/sales" className="btn btn-sm btn-outline-dark"><i className="bi bi-eye"></i> View All</a>
+            </div>
+            <div className="card-body p-0">
+              <div className="table-responsive">
+                <table className="table table-sm mb-0">
+                  <thead className="table-light"><tr><th>Product</th><th>Qty</th><th>Amount</th><th>Profit</th><th>Date</th></tr></thead>
+                  <tbody>
+                    {(data.recent_sales || []).map((sale: any, i: number) => (
+                      <tr key={i}>
+                        <td>{sale.title || sale.product_title}</td>
+                        <td>{sale.quantity_sold}</td>
+                        <td>{money(sale.total_amount, cur)}</td>
+                        <td className="text-success fw-bold">+{money(sale.profit, cur)}</td>
+                        <td className="small text-muted">{String(sale.sale_date).slice(0, 10)}</td>
+                      </tr>
+                    ))}
+                    {(!data.recent_sales || data.recent_sales.length === 0) && (
+                      <tr><td colSpan={5} className="text-center text-muted py-4"><i className="bi bi-inbox fs-5"></i> No sales recorded yet</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Category breakdown */}
-        <div>
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Stock By Category</h2>
-            {data.category_breakdown.length === 0 ? (
-              <p className="text-gray-400 text-sm">No products yet.</p>
-            ) : (
-              <ul className="space-y-3">
-                {data.category_breakdown.map((c: any) => (
-                  <li key={c.category}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">{c.category}</span>
-                      <span className="font-medium">{money(c.value, cur)}</span>
-                    </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-                        style={{ width: `${data.category_breakdown[0]?.value ? Math.max(4, (c.value / data.category_breakdown[0].value) * 100) : 0}%` }}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        {/* Top products */}
-        <div>
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Top Products</h2>
-            {data.top_products.length === 0 ? (
-              <p className="text-gray-400 text-sm">No sales data yet.</p>
-            ) : (
-              <ol className="space-y-3">
-                {data.top_products.map((p: any, i: number) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold">{i + 1}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{p.title}</div>
-                      <div className="text-xs text-gray-400">{p.total_sold} sold</div>
-                    </div>
-                    <div className="font-semibold text-sm">{money(p.revenue, cur)}</div>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </div>
+          {data.top_products && data.top_products.length > 0 && (
+            <div className="card shadow-sm mt-3">
+              <div className="card-header bg-white">
+                <strong><i className="bi bi-trophy"></i> Top Selling Products</strong>
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive">
+                  <table className="table table-sm mb-0">
+                    <thead className="table-light"><tr><th>#</th><th>Product</th><th>Units Sold</th><th>Revenue</th></tr></thead>
+                    <tbody>
+                      {data.top_products.map((t: any, i: number) => (
+                        <tr key={i}>
+                          <td>{i + 1}</td>
+                          <td><strong>{t.title}</strong></td>
+                          <td>{t.total_sold}</td>
+                          <td>{money(t.revenue, cur)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </DashboardShell>

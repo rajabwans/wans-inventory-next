@@ -1,157 +1,106 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [slug, setSlug] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const router = useRouter()
+  const [slug, setSlug] = useState("")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [busy, setBusy] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setBusy(true)
+    setError("")
     try {
       const res = await fetch("/wans/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, username, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Login failed");
-      } else {
-        router.push("/dashboard");
-        router.refresh();
-      }
-    } catch (err) {
-      setError("Network error. Please try again.");
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Login failed")
+      router.push(data.redirect || "/dashboard")
+      router.refresh()
+    } catch (err: any) {
+      setError(err.message || "Login failed")
     } finally {
-      setLoading(false);
+      setBusy(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 bg-gradient-to-br from-indigo-600 via-purple-700 to-indigo-800 text-white">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl font-bold">
-              W
-            </div>
-            <span className="text-2xl font-bold tracking-tight">WANPLAN</span>
-          </div>
-          <p className="mt-8 text-xl text-purple-100">
-            Simple inventory & sales management for your business
-          </p>
-          <ul className="mt-8 space-y-3 text-purple-100">
-            <li className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-green-400 rounded-full" />
-              Track products, sales & expenses
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-green-400 rounded-full" />
-              Manage credit & debtors
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-green-400 rounded-full" />
-              Works offline on any phone
-            </li>
-          </ul>
-        </div>
-        <p className="text-purple-200 text-sm">
-          &copy; 2024 WANPLAN &middot; wanland planner
-        </p>
-      </div>
-
-      {/* Login form */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
-              W
-            </div>
-            <span className="text-2xl font-bold text-indigo-600">WANPLAN</span>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-bold mb-6">Business Login</h2>
-
-            {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Slug
-                </label>
-                <input
-                  type="text"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder="Enter business slug (e.g. wans)"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Your username"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Your password"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold hover:opacity-90 transition disabled:opacity-50"
-              >
-                {loading ? "Logging in..." : "Login"}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <span className="text-gray-600 text-sm">Don&apos;t have an account? </span>
-              <Link href="/signup" className="text-indigo-600 font-medium text-sm hover:underline">
-                Sign Up Free
-              </Link>
-            </div>
+    <div className="auth-shell">
+      <aside className="auth-aside">
+        <a className="auth-brand text-white mb-5 text-decoration-none" href="/wans" style={{ display: "flex", alignItems: "center", gap: "1rem", fontWeight: 700, fontSize: "1.1rem" }}>
+          <span className="auth-logo" style={{ width: 74, height: 74, borderRadius: 22, padding: 6 }}>
+            <img src="/wans/wanplan/logo.svg" alt="WANPLAN" style={{ display: "block", height: "100%", width: "100%" }} />
+          </span>
+          <span className="lh-sm">
+            <span className="d-block fw-bolder brand-text-glow" style={{ fontSize: "2.6rem", letterSpacing: "-.04em", lineHeight: 1 }}>WANPLAN</span>
+            <span className="d-block" style={{ fontSize: ".8rem", opacity: .72, letterSpacing: ".16em", textTransform: "uppercase", marginTop: ".2rem" }}>wanland planner</span>
+          </span>
+        </a>
+        <div className="mb-4">
+          <h2 className="fw-bold text-white mb-3">Inventory done right.</h2>
+          <p className="opacity-75 mb-4">Manage products, sales, customers, expenses and profits — all in one clean workspace.</p>
+          <div className="row g-2">
+            <div className="col-6"><div className="feature-tile"><i className="bi bi-box-seam"></i><p>Track stock in real time</p></div></div>
+            <div className="col-6"><div className="feature-tile"><i className="bi bi-cart"></i><p>Record sales in seconds</p></div></div>
+            <div className="col-6"><div className="feature-tile"><i className="bi bi-people"></i><p>Keep your customers</p></div></div>
+            <div className="col-6"><div className="feature-tile"><i className="bi bi-graph-up"></i><p>Understand your profit</p></div></div>
           </div>
         </div>
-      </div>
+        <div className="small opacity-50">© {new Date().getFullYear()} WANPLAN</div>
+      </aside>
+      <main className="auth-main">
+        <div className="auth-card">
+          <div className="text-center mb-4 d-lg-none">
+            <div className="auth-logo mx-auto mb-2" style={{ width: 76, height: 76, padding: 7, borderRadius: 20 }}>
+              <img src="/wans/wanplan/logo.svg" alt="WANPLAN" />
+            </div>
+            <div className="fw-bolder" style={{ fontSize: "2.1rem", lineHeight: 1, letterSpacing: "-.04em" }}>WANPLAN</div>
+            <div className="small text-muted text-uppercase" style={{ letterSpacing: ".16em" }}>wanland planner</div>
+          </div>
+          <div className="text-center mb-4">
+            <h2 className="mb-1">Welcome back</h2>
+            <p className="lead mb-0">Sign in to your business workspace</p>
+          </div>
+          {error && <div className="alert alert-danger alert-dismissible fade show">{error}</div>}
+          <form onSubmit={submit}>
+            <div className="mb-3">
+              <label className="form-label">Business slug</label>
+              <div className="input-group">
+                <span className="input-group-text"><i className="bi bi-building"></i></span>
+                <input type="text" className="form-control" placeholder="e.g. wans" value={slug} onChange={(e) => setSlug(e.target.value)} required />
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Username</label>
+              <div className="input-group">
+                <span className="input-group-text"><i className="bi bi-person"></i></span>
+                <input type="text" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="form-label">Password</label>
+              <div className="input-group">
+                <span className="input-group-text"><i className="bi bi-lock"></i></span>
+                <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+            </div>
+            <button type="submit" className="btn btn-brand w-100 py-2" disabled={busy}>
+              <i className="bi bi-box-arrow-in-right me-1"></i>{busy ? "Signing in..." : "Sign in"}
+            </button>
+            <p className="text-center text-muted small mt-3 mb-0">
+              New business? <a href="/wans/signup" className="fw-semibold">Create your workspace</a>
+            </p>
+          </form>
+        </div>
+      </main>
     </div>
-  );
+  )
 }

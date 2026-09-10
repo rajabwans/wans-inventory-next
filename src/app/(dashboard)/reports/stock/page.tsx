@@ -41,6 +41,10 @@ export default function StockReportPage() {
   return (
     <DashboardShell businessName="" role="">
       <h1 className="text-2xl font-bold mb-6">Stock Report</h1>
+      <div className="flex gap-2 mb-6 no-print">
+        <a href="/wans/api/reports/stock/pdf" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">Download PDF</a>
+        <a href="/wans/api/reports/stock/csv" className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Export CSV</a>
+      </div>
 
       {totals && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
+import { planGate } from "@/lib/planGate"
 
 export const dynamic = "force-dynamic"
 
@@ -34,6 +35,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
+  const gate = await planGate(session)
+  if (gate) return gate
 
   const bid = session.business_id
   const { id } = await params
@@ -89,6 +92,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
+  const gate = await planGate(session)
+  if (gate) return gate
 
   const bid = session.business_id
   const { id } = await params

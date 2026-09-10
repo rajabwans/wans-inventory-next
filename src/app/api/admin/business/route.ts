@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/session"
 import { supabase } from "@/lib/supabase"
+import { planGate } from "@/lib/planGate"
 
 export const dynamic = "force-dynamic"
 
@@ -35,6 +36,8 @@ export async function PATCH(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
+  const gate = await planGate(session)
+  if (gate) return gate
 
   if (!["admin", "superadmin"].includes(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
